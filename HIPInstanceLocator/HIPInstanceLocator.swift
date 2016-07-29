@@ -12,10 +12,20 @@ import Foundation
  Exceptions that may be thrown by `HIPInstanceLocator`.
  */
 public enum LocatorError : ErrorType {
-    case StoredDependencyWasNotOfExpectedType
-    case FactoryDidNotReturnExpectedType
-    case SharedInstanceWasNotOfExpectedType
+    /// No shared instance or factory was registered for this type. You probably just forgot.
     case NoDependencyRegisteredForType
+
+    /// The factory passed to `HIPInstanceLocator.registerFactory(_:factory)` did not have the expected type.
+    case FactoryDidNotReturnExpectedType
+
+    /// A dependency stored using `HIPInstanceLocator.register(_:sharedInstance)` did not have the expected type.
+    case SharedInstanceWasNotOfExpectedType
+
+    /// The stored return value of the factory passed to `HIPInstanceLocator.registerFactory(_:factory)`
+    /// for the given type did not have the expected type. If you see this, there is probably a bug in the
+    /// framework.
+    case StoredDependencyWasNotOfExpectedType
+
 }
 
 /**
@@ -92,14 +102,14 @@ public enum LocatorError : ErrorType {
 
 public extension HIPInstanceLocator {
     /**
-     Get an instance for a class.
+     Get an instance for a class without any fancy type inference.
     */
     @objc public func objc_getInstanceOfClass(aClass: AnyClass) -> AnyObject! {
         return try? _getWithKey("\(aClass)")
     }
 
     /**
-     Applies previously registered injector to an instance.
+     Applies previously registered injector to an instance without any type inference.
      */
     @objc public func objc_applyInjector(aClass: AnyClass, toInstance instance: AnyObject) -> Bool {
         return _applyInjector("\(aClass)", instance: instance)
