@@ -11,6 +11,27 @@ import Foundation
 /** 
  Instance locator assemblies are used to encapsulate a set of locator registrations so that they may be located near
  code that uses them. Assemblies are applied to instance locators using the `assemble` method.
+ 
+ You might want to use these if you have a high quantity of types to be injected.
+ 
+ Example:
+ 
+ ```swift
+ let servicesAssembly = HIPInstanceLocatorAssembly() {
+    locator in
+    locator.registerFactory(AService.self) { return AService()) }
+    locator.registerFactory(AnotherService.self) { return AnotherService() }
+ }
+ 
+ let modelsAssembly = HIPInstanceLocatorAssembly() {
+    locator in
+    locator.registerFactory(AModel.self) { return AModel(aService: $0.implicitGet()) }
+    locator.registerFactory(AnotherModel.self) { return AnotherModel(anotherService: $0.implicitGet()) }
+ }
+ 
+ let locator = HIPInstanceLocator()
+ locator.assemble(servicesAssembly, modelsAssembly)
+ ```
  */
 public struct HIPInstanceLocatorAssembly {
     private let _assemblyBlock: HIPInstanceLocator -> Void
