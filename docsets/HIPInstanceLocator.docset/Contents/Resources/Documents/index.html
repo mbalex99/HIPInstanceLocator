@@ -115,6 +115,11 @@ dependency injection blocks on your locator:</p>
 <span class="nf">presentViewController</span><span class="p">(</span><span class="n">viewController</span><span class="p">,</span> <span class="nv">animated</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span> <span class="nv">completion</span><span class="p">:</span> <span class="kc">nil</span><span class="p">)</span>
 </code></pre></li>
 </ol>
+
+<p>Any view controllers instantiated by this storyboard are automatically injected.
+Additionally, any storyboard references also result in <code>HIPLocatorStoryboard</code>
+instances. So you don&rsquo;t need to worry about doing all your segues and presentations
+in code to use dependency injection!</p>
 <a href='#contributors' class='anchor' aria-hidden=true><span class="header-anchor"></span></a><h2 id='contributors'>Contributors</h2>
 
 <ul>
