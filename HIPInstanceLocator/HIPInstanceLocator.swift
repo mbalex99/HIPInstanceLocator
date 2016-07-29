@@ -57,13 +57,17 @@ public enum LocatorError : ErrorType {
 
     /**
      Register an existing shared instance for the specified type. Instances registered this way are assumed to be
-     retained elsewhere, so the locator will only hold a weak reference to it.
+     retained elsewhere, so the locator will only hold a weak reference to it. Because the locator holds a weak
+     reference, this method may only be used with class types.
+
      - Return:
          - `true` if the shared instance was successfully registered.
      - Note: The shared instance must be a class instance.
      */
-    public func register<T>(key:T.Type, sharedInstance: T) -> Bool {
-        guard let sharedObject = sharedInstance as? AnyObject else { return false }
+    public func register<T where T: AnyObject>(key:T.Type, sharedInstance: T) -> Bool {
+        guard let sharedObject = sharedInstance as? AnyObject else {
+            return false
+        }
         let box = _Instance.SharedBox(value: sharedObject)
         return _setInstanceForKey("\(T.self)", instance: .Shared(box))
     }
@@ -96,6 +100,13 @@ public enum LocatorError : ErrorType {
      Use this method when the return type can be inferred, such as initializer or method parameters.
      */
     public func implicitGet<T>() -> T! { return try? _getWithKey("\(T.self)") }
+
+    /**
+     Injects `instance` using the block specified for `T` in `HIPInstanceLocator.injectInstancesOf(_:injector:)`
+     */
+    public func applyInjector<T>(instance: T) -> Bool {
+        return _applyInjector("\(T.self)", instance: instance)
+    }
 }
 
 /// MARK: - ObjC Bridging
