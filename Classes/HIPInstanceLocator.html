@@ -116,9 +116,21 @@ a specific context. Instances are registered using factory blocks, which are laz
                       <div class="pointer"></div>
                       <div class="abstract">
                         <p>Register an factory method for the specified type. The factory block is called the first time <code>get()</code> is called
-for this type. Subsequent calls to <code>get()</code> return cached instances.
-- Return:
-    - <code>true</code> if the factory method was successfully registered.</p>
+for this type. Subsequent calls to <code>get()</code> return cached instances.</p>
+
+<p>Example:</p>
+
+<pre class="highlight swift"><code><span class="n">locator</span><span class="o">.</span><span class="nf">registerFactory</span><span class="p">(</span><span class="kt">MyClass</span><span class="o">.</span><span class="k">self</span><span class="p">)</span> <span class="p">{</span>
+   <span class="n">locator</span> <span class="k">in</span>
+   <span class="k">return</span> <span class="kt">MyClass</span><span class="p">()</span>
+<span class="p">}</span>
+</code></pre>
+
+<div class="aside aside-returns">
+    <p class="aside-title">Returns</p>
+    <code>true</code> if the factory method was successfully registered, otherwise <code>false</code>
+
+</div>
 
                       </div>
                       <div class="declaration">
@@ -129,8 +141,13 @@ for this type. Subsequent calls to <code>get()</code> return cached instances.
 
                         </div>
                       </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p><code>true</code> if the factory method was successfully registered, otherwise <code>false</code></p>
+
+                      </div>
                       <div class="slightly-smaller">
-                        <a href="https://github.com/Hipmunk/HIPInstanceLocator/tree/master/HIPInstanceLocator/HIPInstanceLocator.swift#L54-L56">Show on GitHub</a>
+                        <a href="https://github.com/Hipmunk/HIPInstanceLocator/tree/master/HIPInstanceLocator/HIPInstanceLocator.swift#L65-L67">Show on GitHub</a>
                       </div>
                     </section>
                   </div>
@@ -152,16 +169,23 @@ for this type. Subsequent calls to <code>get()</code> return cached instances.
 retained elsewhere, so the locator will only hold a weak reference to it. Because the locator holds a weak
 reference, this method may only be used with class types.</p>
 
-<p><li>Return:</p>
-
-<p><ul>
-<li><code>true</code> if the shared instance was successfully registered.</li>
-</ul></li>
 <div class="aside aside-note">
     <p class="aside-title">Note</p>
-    The shared instance must be a class instance.</p>
+    The shared instance must be a class instance.
 
-<p></div></p>
+</div>
+
+<p>Example:</p>
+
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">mySingleton</span> <span class="o">=</span> <span class="kt">SingletonClass</span><span class="p">()</span>
+<span class="n">locator</span><span class="o">.</span><span class="nf">register</span><span class="p">(</span><span class="kt">SingletonClass</span><span class="o">.</span><span class="k">self</span><span class="p">,</span> <span class="n">mySingleton</span><span class="p">)</span>  <span class="c1">// stores a weak ref</span>
+</code></pre>
+
+<div class="aside aside-returns">
+    <p class="aside-title">Returns</p>
+    <code>true</code> if the shared instance was successfully registered, otherwise <code>false</code>
+
+</div>
 
                       </div>
                       <div class="declaration">
@@ -172,39 +196,13 @@ reference, this method may only be used with class types.</p>
 
                         </div>
                       </div>
-                      <div class="slightly-smaller">
-                        <a href="https://github.com/Hipmunk/HIPInstanceLocator/tree/master/HIPInstanceLocator/HIPInstanceLocator.swift#L67-L73">Show on GitHub</a>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:FC18HIPInstanceLocator18HIPInstanceLocator17injectInstancesOfurFTMx8injectorFTS0_x_T__Sb"></a>
-                    <a name="//apple_ref/swift/Method/injectInstancesOf(_:injector:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:FC18HIPInstanceLocator18HIPInstanceLocator17injectInstancesOfurFTMx8injectorFTS0_x_T__Sb">injectInstancesOf(_:injector:)</a>
-                    </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>Registers an injector method for the specified type. The injector method is called once for each instance created
-by the instance locator. The injector is also used for objects initialized in storyboards.</p>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p><code>true</code> if the shared instance was successfully registered, otherwise <code>false</code></p>
 
                       </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="n">injectInstancesOf</span><span class="o">&lt;</span><span class="kt">T</span><span class="o">&gt;</span><span class="p">(</span><span class="nv">key</span><span class="p">:</span> <span class="kt">T</span><span class="o">.</span><span class="k">Type</span><span class="p">,</span> <span class="nv">injector</span><span class="p">:((</span><span class="kt">HIPInstanceLocator</span><span class="p">,</span> <span class="kt">T</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="kt">Bool</span></code></pre>
-
-                        </div>
-                      </div>
                       <div class="slightly-smaller">
-                        <a href="https://github.com/Hipmunk/HIPInstanceLocator/tree/master/HIPInstanceLocator/HIPInstanceLocator.swift#L79-L87">Show on GitHub</a>
+                        <a href="https://github.com/Hipmunk/HIPInstanceLocator/tree/master/HIPInstanceLocator/HIPInstanceLocator.swift#L86-L92">Show on GitHub</a>
                       </div>
                     </section>
                   </div>
@@ -223,9 +221,23 @@ by the instance locator. The injector is also used for objects initialized in st
                       <div class="pointer"></div>
                       <div class="abstract">
                         <p>Gets an instance of a previously registered type. If an instance was not already created, it will be initialized. 
-If this type was not registered, this returns nil and throws a debug assert.
-- Parameters:
-   - _: Type of instance to get.</p>
+If this type was not registered, this returns nil and throws a debug assert.</p>
+
+<p>You&rsquo;ll typically use this inside a <code><a href="../Classes/HIPInstanceLocator.html#/s:FC18HIPInstanceLocator18HIPInstanceLocator17injectInstancesOfurFTMx8injectorFTS0_x_T__Sb">HIPInstanceLocator.injectInstancesOf(_:injector:)</a></code> block.</p>
+
+<div class="aside aside-note">
+    <p class="aside-title">Note</p>
+    <p>You may want to use <code><a href="../Classes/HIPInstanceLocator.html#/s:FC18HIPInstanceLocator18HIPInstanceLocator11implicitGeturFT_GSQx_">HIPInstanceLocator.implicitGet()</a></code> instead for most cases.</p>
+
+</div>
+
+<div class="aside aside-parameter">
+    <p class="aside-title">Parameter</p>
+    <p>Parameter _: Type of instance to get.</p>
+
+</div>
+
+<p>Example</p>
 
                       </div>
                       <div class="declaration">
@@ -236,28 +248,8 @@ If this type was not registered, this returns nil and throws a debug assert.
 
                         </div>
                       </div>
-                      <div>
-                        <h4>Parameters</h4>
-                        <table class="graybox">
-                          <tbody>
-                            <tr>
-                              <td>
-                                <code>
-                                <em>_</em>
-                                </code>
-                              </td>
-                              <td>
-                                <div>
-                                  <p>: Type of instance to get.</p>
-
-                                </div>
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
                       <div class="slightly-smaller">
-                        <a href="https://github.com/Hipmunk/HIPInstanceLocator/tree/master/HIPInstanceLocator/HIPInstanceLocator.swift#L95">Show on GitHub</a>
+                        <a href="https://github.com/Hipmunk/HIPInstanceLocator/tree/master/HIPInstanceLocator/HIPInstanceLocator.swift#L106">Show on GitHub</a>
                       </div>
                     </section>
                   </div>
@@ -279,6 +271,20 @@ If this type was not registered, this returns nil and throws a debug assert.
 initialized. If this type was not registered, this returns nil and throws a debug assert.
 Use this method when the return type can be inferred, such as initializer or method parameters.</p>
 
+<p>This method is made possible by Swift&rsquo;s type inference. The left side of the assignment expression typically
+has an explicit type, so you can just say <q>give me whatever I&rsquo;m asking for.</q></p>
+
+<p>You&rsquo;ll typically use this inside a <code><a href="../Classes/HIPInstanceLocator.html#/s:FC18HIPInstanceLocator18HIPInstanceLocator17injectInstancesOfurFTMx8injectorFTS0_x_T__Sb">HIPInstanceLocator.injectInstancesOf(_:injector:)</a></code> block.</p>
+
+<p>Example:</p>
+
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">standardBackground</span> <span class="o">=</span> <span class="kt">UIColor</span><span class="o">.</span><span class="nf">redColor</span><span class="p">()</span>
+<span class="n">locator</span><span class="o">.</span><span class="nf">injectInstancesOf</span><span class="p">(</span><span class="kt">MyViewController</span><span class="o">.</span><span class="k">self</span><span class="p">)</span> <span class="p">{</span>
+   <span class="n">locator</span><span class="p">,</span> <span class="n">viewController</span> <span class="k">in</span> <span class="k">in</span>
+   <span class="n">viewController</span><span class="o">.</span><span class="n">myColor</span> <span class="o">=</span> <span class="n">locator</span><span class="o">.</span><span class="nf">implicitGet</span><span class="p">()</span>  <span class="c1">// magic!</span>
+<span class="p">}</span>
+</code></pre>
+
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
@@ -289,7 +295,57 @@ Use this method when the return type can be inferred, such as initializer or met
                         </div>
                       </div>
                       <div class="slightly-smaller">
-                        <a href="https://github.com/Hipmunk/HIPInstanceLocator/tree/master/HIPInstanceLocator/HIPInstanceLocator.swift#L102">Show on GitHub</a>
+                        <a href="https://github.com/Hipmunk/HIPInstanceLocator/tree/master/HIPInstanceLocator/HIPInstanceLocator.swift#L128">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:FC18HIPInstanceLocator18HIPInstanceLocator17injectInstancesOfurFTMx8injectorFTS0_x_T__Sb"></a>
+                    <a name="//apple_ref/swift/Method/injectInstancesOf(_:injector:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:FC18HIPInstanceLocator18HIPInstanceLocator17injectInstancesOfurFTMx8injectorFTS0_x_T__Sb">injectInstancesOf(_:injector:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Registers an injector method for the specified type. The injector method is called once for each instance created
+by the instance locator. The injector is also used for objects initialized in storyboards.</p>
+
+<p>Example:</p>
+
+<pre class="highlight swift"><code><span class="n">locator</span><span class="o">.</span><span class="nf">injectInstancesOf</span><span class="p">(</span><span class="kt">MyViewController</span><span class="o">.</span><span class="k">self</span><span class="p">)</span> <span class="p">{</span>
+   <span class="n">locator</span><span class="p">,</span> <span class="n">viewController</span> <span class="k">in</span>
+   <span class="n">viewController</span><span class="o">.</span><span class="n">someDependency</span> <span class="o">=</span> <span class="n">locator</span><span class="o">.</span><span class="nf">implicitGet</span><span class="p">()</span>
+<span class="p">}</span>
+</code></pre>
+
+<div class="aside aside-returns">
+    <p class="aside-title">Returns</p>
+    <code>true</code> if the instance was injected, otherwise <code>false</code>
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="n">injectInstancesOf</span><span class="o">&lt;</span><span class="kt">T</span><span class="o">&gt;</span><span class="p">(</span><span class="nv">key</span><span class="p">:</span> <span class="kt">T</span><span class="o">.</span><span class="k">Type</span><span class="p">,</span> <span class="nv">injector</span><span class="p">:((</span><span class="kt">HIPInstanceLocator</span><span class="p">,</span> <span class="kt">T</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="kt">Bool</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p><code>true</code> if the instance was injected, otherwise <code>false</code></p>
+
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/Hipmunk/HIPInstanceLocator/tree/master/HIPInstanceLocator/HIPInstanceLocator.swift#L145-L153">Show on GitHub</a>
                       </div>
                     </section>
                   </div>
@@ -319,7 +375,7 @@ Use this method when the return type can be inferred, such as initializer or met
                         </div>
                       </div>
                       <div class="slightly-smaller">
-                        <a href="https://github.com/Hipmunk/HIPInstanceLocator/tree/master/HIPInstanceLocator/HIPInstanceLocator.swift#L107-L109">Show on GitHub</a>
+                        <a href="https://github.com/Hipmunk/HIPInstanceLocator/tree/master/HIPInstanceLocator/HIPInstanceLocator.swift#L158-L160">Show on GitHub</a>
                       </div>
                     </section>
                   </div>
@@ -389,7 +445,7 @@ those dependencies were registered or injected outside of an assembly.</p>
                         </div>
                       </div>
                       <div class="slightly-smaller">
-                        <a href="https://github.com/Hipmunk/HIPInstanceLocator/tree/master/HIPInstanceLocator/HIPInstanceLocator.swift#L118-L120">Show on GitHub</a>
+                        <a href="https://github.com/Hipmunk/HIPInstanceLocator/tree/master/HIPInstanceLocator/HIPInstanceLocator.swift#L169-L171">Show on GitHub</a>
                       </div>
                     </section>
                   </div>
@@ -419,7 +475,7 @@ those dependencies were registered or injected outside of an assembly.</p>
                         </div>
                       </div>
                       <div class="slightly-smaller">
-                        <a href="https://github.com/Hipmunk/HIPInstanceLocator/tree/master/HIPInstanceLocator/HIPInstanceLocator.swift#L125-L127">Show on GitHub</a>
+                        <a href="https://github.com/Hipmunk/HIPInstanceLocator/tree/master/HIPInstanceLocator/HIPInstanceLocator.swift#L176-L178">Show on GitHub</a>
                       </div>
                     </section>
                   </div>
