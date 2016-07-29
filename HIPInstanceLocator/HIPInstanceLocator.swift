@@ -48,8 +48,19 @@ public enum LocatorError : ErrorType {
     /**
      Register an factory method for the specified type. The factory block is called the first time `get()` is called
      for this type. Subsequent calls to `get()` return cached instances.
-     - Return:
-         - `true` if the factory method was successfully registered.
+     
+     Example:
+     
+     
+     ```swift
+     locator.registerFactory(MyClass.self) {
+        locator in
+        return MyClass()
+     }
+     ```
+
+     - Returns: `true` if the factory method was successfully registered, otherwise `false`
+
      */
     public func registerFactory<T>(key:T.Type, factory:HIPInstanceLocator -> T) -> Bool {
         return _setInstanceForKey("\(T.self)", instance: .Uninitialized(factory))
@@ -60,9 +71,17 @@ public enum LocatorError : ErrorType {
      retained elsewhere, so the locator will only hold a weak reference to it. Because the locator holds a weak
      reference, this method may only be used with class types.
 
-     - Return:
-         - `true` if the shared instance was successfully registered.
      - Note: The shared instance must be a class instance.
+     
+     
+     Example:
+     
+     ```swift
+     let mySingleton = SingletonClass()
+     locator.register(SingletonClass.self, mySingleton)  // stores a weak ref
+     ```
+
+     - Returns: `true` if the shared instance was successfully registered, otherwise `false`
      */
     public func register<T where T: AnyObject>(key:T.Type, sharedInstance: T) -> Bool {
         guard let sharedObject = sharedInstance as? AnyObject else {
@@ -73,8 +92,55 @@ public enum LocatorError : ErrorType {
     }
 
     /**
+     Gets an instance of a previously registered type. If an instance was not already created, it will be initialized. 
+     If this type was not registered, this returns nil and throws a debug assert.
+     
+     You'll typically use this inside a `HIPInstanceLocator.injectInstancesOf(_:injector:)` block.
+     
+     - Note: You may want to use `HIPInstanceLocator.implicitGet()` instead for most cases.
+
+     - Parameter _: Type of instance to get.
+     
+     Example
+     */
+    public func getInstanceOf<T>(_:T.Type) -> T! { return try? _getWithKey("\(T.self)") }
+
+    /**
+     Implicitly gets an instance of a previously registered type. If an instance was not already created, it will be 
+     initialized. If this type was not registered, this returns nil and throws a debug assert.
+     Use this method when the return type can be inferred, such as initializer or method parameters.
+     
+     This method is made possible by Swift's type inference. The left side of the assignment expression typically
+     has an explicit type, so you can just say "give me whatever I'm asking for."
+
+     You'll typically use this inside a `HIPInstanceLocator.injectInstancesOf(_:injector:)` block.
+     
+     Example:
+     
+     ```swift
+     let standardBackground = UIColor.redColor()
+     locator.injectInstancesOf(MyViewController.self) {
+        locator, viewController in in
+        viewController.myColor = locator.implicitGet()  // magic!
+     }
+     ```
+     */
+    public func implicitGet<T>() -> T! { return try? _getWithKey("\(T.self)") }
+
+    /**
      Registers an injector method for the specified type. The injector method is called once for each instance created
      by the instance locator. The injector is also used for objects initialized in storyboards.
+     
+     Example:
+     
+     ```swift
+     locator.injectInstancesOf(MyViewController.self) {
+        locator, viewController in
+        viewController.someDependency = locator.implicitGet()
+     }
+     ```
+
+     - Returns: `true` if the instance was injected, otherwise `false`
      */
     public func injectInstancesOf<T>(key: T.Type, injector:((HIPInstanceLocator, T) -> Void)) -> Bool {
         return _setInjectorForKey("\(T.self)") {
@@ -85,21 +151,6 @@ public enum LocatorError : ErrorType {
             injector(locator, instance)
         }
     }
-
-    /**
-     Gets an instance of a previously registered type. If an instance was not already created, it will be initialized. 
-     If this type was not registered, this returns nil and throws a debug assert.
-     - Parameters:
-        - _: Type of instance to get.
-     */
-    public func getInstanceOf<T>(_:T.Type) -> T! { return try? _getWithKey("\(T.self)") }
-
-    /**
-     Implicitly gets an instance of a previously registered type. If an instance was not already created, it will be 
-     initialized. If this type was not registered, this returns nil and throws a debug assert.
-     Use this method when the return type can be inferred, such as initializer or method parameters.
-     */
-    public func implicitGet<T>() -> T! { return try? _getWithKey("\(T.self)") }
 
     /**
      Injects `instance` using the block specified for `T` in `HIPInstanceLocator.injectInstancesOf(_:injector:)`
