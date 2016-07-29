@@ -10,6 +10,13 @@
 		F2E91FE31D4BF16100FB33B5 /* HIPInstanceLocator.h in Headers */ = {isa = PBXBuildFile; fileRef = F2E91FE21D4BF16100FB33B5 /* HIPInstanceLocator.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F2E91FEA1D4BF16100FB33B5 /* HIPInstanceLocator.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F2E91FDF1D4BF16000FB33B5 /* HIPInstanceLocator.framework */; };
 		F2E91FEF1D4BF16100FB33B5 /* HIPInstanceLocatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2E91FEE1D4BF16100FB33B5 /* HIPInstanceLocatorTests.swift */; };
+		F2E91FFD1D4BF1B700FB33B5 /* HIPInstanceLocator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2E91FF91D4BF1B700FB33B5 /* HIPInstanceLocator.swift */; };
+		F2E91FFE1D4BF1B700FB33B5 /* HIPInstanceLocatorAssembly.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2E91FFA1D4BF1B700FB33B5 /* HIPInstanceLocatorAssembly.swift */; };
+		F2E91FFF1D4BF1B700FB33B5 /* HIPLocatorStoryboard.h in Headers */ = {isa = PBXBuildFile; fileRef = F2E91FFB1D4BF1B700FB33B5 /* HIPLocatorStoryboard.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		F2E920001D4BF1B700FB33B5 /* HIPLocatorStoryboard.m in Sources */ = {isa = PBXBuildFile; fileRef = F2E91FFC1D4BF1B700FB33B5 /* HIPLocatorStoryboard.m */; };
+		F2E920041D4BF21F00FB33B5 /* TestInstanceLocator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2E920011D4BF21F00FB33B5 /* TestInstanceLocator.swift */; };
+		F2E920051D4BF21F00FB33B5 /* TestLocatorStoryboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F2E920021D4BF21F00FB33B5 /* TestLocatorStoryboard.storyboard */; };
+		F2E920061D4BF21F00FB33B5 /* TestLocatorStoryboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2E920031D4BF21F00FB33B5 /* TestLocatorStoryboard.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -29,6 +36,13 @@
 		F2E91FE91D4BF16100FB33B5 /* HIPInstanceLocatorTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HIPInstanceLocatorTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F2E91FEE1D4BF16100FB33B5 /* HIPInstanceLocatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HIPInstanceLocatorTests.swift; sourceTree = "<group>"; };
 		F2E91FF01D4BF16100FB33B5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F2E91FF91D4BF1B700FB33B5 /* HIPInstanceLocator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HIPInstanceLocator.swift; sourceTree = "<group>"; };
+		F2E91FFA1D4BF1B700FB33B5 /* HIPInstanceLocatorAssembly.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HIPInstanceLocatorAssembly.swift; sourceTree = "<group>"; };
+		F2E91FFB1D4BF1B700FB33B5 /* HIPLocatorStoryboard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HIPLocatorStoryboard.h; sourceTree = "<group>"; };
+		F2E91FFC1D4BF1B700FB33B5 /* HIPLocatorStoryboard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HIPLocatorStoryboard.m; sourceTree = "<group>"; };
+		F2E920011D4BF21F00FB33B5 /* TestInstanceLocator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestInstanceLocator.swift; sourceTree = "<group>"; };
+		F2E920021D4BF21F00FB33B5 /* TestLocatorStoryboard.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = TestLocatorStoryboard.storyboard; sourceTree = "<group>"; };
+		F2E920031D4BF21F00FB33B5 /* TestLocatorStoryboard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestLocatorStoryboard.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -71,6 +85,10 @@
 		F2E91FE11D4BF16100FB33B5 /* HIPInstanceLocator */ = {
 			isa = PBXGroup;
 			children = (
+				F2E91FF91D4BF1B700FB33B5 /* HIPInstanceLocator.swift */,
+				F2E91FFA1D4BF1B700FB33B5 /* HIPInstanceLocatorAssembly.swift */,
+				F2E91FFB1D4BF1B700FB33B5 /* HIPLocatorStoryboard.h */,
+				F2E91FFC1D4BF1B700FB33B5 /* HIPLocatorStoryboard.m */,
 				F2E91FE21D4BF16100FB33B5 /* HIPInstanceLocator.h */,
 				F2E91FE41D4BF16100FB33B5 /* Info.plist */,
 			);
@@ -80,6 +98,9 @@
 		F2E91FED1D4BF16100FB33B5 /* HIPInstanceLocatorTests */ = {
 			isa = PBXGroup;
 			children = (
+				F2E920011D4BF21F00FB33B5 /* TestInstanceLocator.swift */,
+				F2E920021D4BF21F00FB33B5 /* TestLocatorStoryboard.storyboard */,
+				F2E920031D4BF21F00FB33B5 /* TestLocatorStoryboard.swift */,
 				F2E91FEE1D4BF16100FB33B5 /* HIPInstanceLocatorTests.swift */,
 				F2E91FF01D4BF16100FB33B5 /* Info.plist */,
 			);
@@ -93,6 +114,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F2E91FFF1D4BF1B700FB33B5 /* HIPLocatorStoryboard.h in Headers */,
 				F2E91FE31D4BF16100FB33B5 /* HIPInstanceLocator.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -184,6 +206,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F2E920051D4BF21F00FB33B5 /* TestLocatorStoryboard.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -194,6 +217,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F2E91FFE1D4BF1B700FB33B5 /* HIPInstanceLocatorAssembly.swift in Sources */,
+				F2E91FFD1D4BF1B700FB33B5 /* HIPInstanceLocator.swift in Sources */,
+				F2E920001D4BF1B700FB33B5 /* HIPLocatorStoryboard.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -201,7 +227,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F2E920061D4BF21F00FB33B5 /* TestLocatorStoryboard.swift in Sources */,
 				F2E91FEF1D4BF16100FB33B5 /* HIPInstanceLocatorTests.swift in Sources */,
+				F2E920041D4BF21F00FB33B5 /* TestInstanceLocator.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -310,6 +338,7 @@
 		F2E91FF41D4BF16100FB33B5 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -320,12 +349,15 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.hipmunk.HIPInstanceLocator;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
 		F2E91FF51D4BF16100FB33B5 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -336,6 +368,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.hipmunk.HIPInstanceLocator;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "";
 			};
 			name = Release;
 		};
