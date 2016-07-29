@@ -68,6 +68,26 @@
             <p>Instance locator assemblies are used to encapsulate a set of locator registrations so that they may be located near
 code that uses them. Assemblies are applied to instance locators using the <code>assemble</code> method.</p>
 
+<p>You might want to use these if you have a high quantity of types to be injected.</p>
+
+<p>Example:</p>
+
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">servicesAssembly</span> <span class="o">=</span> <span class="kt">HIPInstanceLocatorAssembly</span><span class="p">()</span> <span class="p">{</span>
+   <span class="n">locator</span> <span class="k">in</span>
+   <span class="n">locator</span><span class="o">.</span><span class="nf">registerFactory</span><span class="p">(</span><span class="kt">AService</span><span class="o">.</span><span class="k">self</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="kt">AService</span><span class="p">())</span> <span class="p">}</span>
+   <span class="n">locator</span><span class="o">.</span><span class="nf">registerFactory</span><span class="p">(</span><span class="kt">AnotherService</span><span class="o">.</span><span class="k">self</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="kt">AnotherService</span><span class="p">()</span> <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">let</span> <span class="nv">modelsAssembly</span> <span class="o">=</span> <span class="kt">HIPInstanceLocatorAssembly</span><span class="p">()</span> <span class="p">{</span>
+   <span class="n">locator</span> <span class="k">in</span>
+   <span class="n">locator</span><span class="o">.</span><span class="nf">registerFactory</span><span class="p">(</span><span class="kt">AModel</span><span class="o">.</span><span class="k">self</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="kt">AModel</span><span class="p">(</span><span class="nv">aService</span><span class="p">:</span> <span class="nv">$0</span><span class="o">.</span><span class="nf">implicitGet</span><span class="p">())</span> <span class="p">}</span>
+   <span class="n">locator</span><span class="o">.</span><span class="nf">registerFactory</span><span class="p">(</span><span class="kt">AnotherModel</span><span class="o">.</span><span class="k">self</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="kt">AnotherModel</span><span class="p">(</span><span class="nv">anotherService</span><span class="p">:</span> <span class="nv">$0</span><span class="o">.</span><span class="nf">implicitGet</span><span class="p">())</span> <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">let</span> <span class="nv">locator</span> <span class="o">=</span> <span class="kt">HIPInstanceLocator</span><span class="p">()</span>
+<span class="n">locator</span><span class="o">.</span><span class="nf">assemble</span><span class="p">(</span><span class="n">servicesAssembly</span><span class="p">,</span> <span class="n">modelsAssembly</span><span class="p">)</span>
+</code></pre>
+
           </section>
           <section class="section task-group-section">
             <div class="task-group">
@@ -98,7 +118,7 @@ assembly is applied to an instance locator.</p>
                         </div>
                       </div>
                       <div class="slightly-smaller">
-                        <a href="https://github.com/Hipmunk/HIPInstanceLocator/tree/master/HIPInstanceLocator/HIPInstanceLocatorAssembly.swift#L22-L24">Show on GitHub</a>
+                        <a href="https://github.com/Hipmunk/HIPInstanceLocator/tree/master/HIPInstanceLocator/HIPInstanceLocatorAssembly.swift#L43-L45">Show on GitHub</a>
                       </div>
                     </section>
                   </div>
