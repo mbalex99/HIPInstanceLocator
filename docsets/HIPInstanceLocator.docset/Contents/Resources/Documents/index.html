@@ -64,11 +64,57 @@
 
 <p><a href="http://hipmunk.github.io/HIPInstanceLocator/">Docs (you may already be here)</a></p>
 
-<p>Summary summary</p>
+<p>This is a small dependency injection framework. It&rsquo;s like
+<a href="https://github.com/Swinject/Swinject">Swinject</a>, but with fewer features,
+different method names, and a different implementation of auto-injecting
+storyboards. At Hipmunk we use it to support our Model-View-ViewModel (MVVM)
+architecture.</p>
 
-<p>Swinject link</p>
-<a href='#design-goals' class='anchor' aria-hidden=true><span class="header-anchor"></span></a><h2 id='design-goals'>Design goals</h2>
-<a href='#examples' class='anchor' aria-hidden=true><span class="header-anchor"></span></a><h2 id='examples'>Examples</h2>
+<p>You might find that Swinject is a better fit for you, but we decided to publish
+this framework anyway because:</p>
+
+<ul>
+<li>It&rsquo;s very small; you can learn from it by reading it</li>
+<li>We use it and are happy with it</li>
+<li>We tried to use Swinject instead but its auto-injecting storyboard implementation
+seemed to be buggy</li>
+<li>It introduces the idea of an <em>assembly</em>: a conceptual grouping of dependency
+declarations.</li>
+</ul>
+
+<p>If you&rsquo;d like to use <code>HIPInstanceLocator</code> but aren&rsquo;t satisfied with its level
+of documentation, please open an issue on GitHub or vote for an existing one.</p>
+<a href='#auto-injecting-storyboards-code-hiplocatorstoryboard-code' class='anchor' aria-hidden=true><span class="header-anchor"></span></a><h2 id='auto-injecting-storyboards-code-hiplocatorstoryboard-code'>Auto-Injecting Storyboards (<code>HIPLocatorStoryboard</code>)</h2>
+
+<p>This framework has one class that isn&rsquo;t listed in the sidebar because it&rsquo;s
+an Objective-C class: <code>HIPLocatorStoryboard</code>. If you instantiate a storyboard
+as a <code>HIPLocatorStoryboard</code>, then any view controllers inside it may have its
+dependencies injected using blocks specified by
+`locator.injectInstancesOf(T, factory:).</p>
+
+<p>Usage:</p>
+
+<ol>
+<li><p>Add <code>&lt;HIPInstanceLocator/HIPInstanceLocator.h&gt;</code> to your bridging header.
+<code>HIPLocatorStoryboard</code> is an Objective-C class, and it needs to be bridged
+over to Swift. Unfortunately, frameworks don&rsquo;t support briding headers, so
+this can&rsquo;t be done automatically yet.</p></li>
+<li><p>For the storyboard whose view controllers you want to inject, register
+dependency injection blocks on your locator:</p>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">locator</span> <span class="o">=</span> <span class="kt">HIPInstanceLocator</span><span class="p">()</span>
+<span class="n">locator</span><span class="o">.</span><span class="nf">injectInstancesOf</span><span class="p">(</span><span class="kt">MyViewController</span><span class="o">.</span><span class="k">self</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">locator</span><span class="p">,</span> <span class="n">viewController</span> <span class="k">in</span>
+  <span class="nf">print</span><span class="p">(</span><span class="s">"Injecting MyViewController"</span><span class="p">)</span>
+  <span class="n">viewController</span><span class="o">.</span><span class="n">someDependency</span> <span class="o">=</span> <span class="n">locator</span><span class="o">.</span><span class="nf">implicitGet</span><span class="p">()</span>
+<span class="p">}</span>
+</code></pre></li>
+<li><p>Instantiate the storyboard:</p>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">storyboard</span> <span class="o">=</span> <span class="kt">HIPLocatorStoryboard</span><span class="p">(</span><span class="nv">name</span><span class="p">:</span> <span class="s">"MyStoryboard"</span><span class="p">,</span> <span class="nv">bundle</span><span class="p">:</span> <span class="kc">nil</span><span class="p">,</span> <span class="nv">locator</span><span class="p">:</span> <span class="n">locator</span><span class="p">)</span>
+<span class="k">let</span> <span class="nv">viewController</span> <span class="o">=</span> <span class="n">storyboard</span><span class="o">.</span><span class="nf">instantiateInitialViewController</span><span class="p">()</span><span class="o">!</span>
+<span class="c1">// should have printed "Injecting MyViewController"</span>
+<span class="nf">presentViewController</span><span class="p">(</span><span class="n">viewController</span><span class="p">,</span> <span class="nv">animated</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span> <span class="nv">completion</span><span class="p">:</span> <span class="kc">nil</span><span class="p">)</span>
+</code></pre></li>
+</ol>
 <a href='#contributors' class='anchor' aria-hidden=true><span class="header-anchor"></span></a><h2 id='contributors'>Contributors</h2>
 
 <ul>
