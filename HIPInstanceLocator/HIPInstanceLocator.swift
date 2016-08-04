@@ -34,6 +34,10 @@ public enum LocatorError : ErrorType {
 
 }
 
+private let DEFAULT_ERROR_CALLBACK = {
+    (e: ErrorType) in assertionFailure("\(e)")
+}
+
 /**
  An implementation of the service locator pattern. Provides a place to register and get shared instances of classes for
  a specific context. Instances are registered using factory blocks, which are lazily instantiated on demand.
@@ -42,15 +46,14 @@ public enum LocatorError : ErrorType {
     private var _registeredInstances: [String: _Instance] = Dictionary()
     private var _registeredInjectors: [String: _Injector] = Dictionary()
     private let _lock = NSObject()
-    private let _errorCallback: (ErrorType -> ())?
+    private let _errorCallback: (ErrorType -> ())
 
     /**
      Initializes a locator instance
-     - Parameter errorCallback: Block to be called when an error occurs. If you don't pass something, all errors are
-        silently swallowed. You probably don't want that, but `HIPInstanceLocator` tries to be flexible with respect to
-        how your tests run and what causes a crash. You'll probably want to make it an assertion failure.
+     - Parameter errorCallback: Block to be called when an error occurs. If you leave it alone, it will be an assertion
+        failure.
      */
-    public init(errorCallback: (ErrorType -> ())? = nil) {
+    public init(errorCallback: (ErrorType -> ()) = DEFAULT_ERROR_CALLBACK) {
         _errorCallback = errorCallback
         super.init()
     }
@@ -58,11 +61,10 @@ public enum LocatorError : ErrorType {
     /**
      Initializes a locator instance; the assembly block is executed immediately after initialization.
      - Parameter assemblyBlock: Assembly to be applied immediately
-     - Parameter errorCallback: Block to be called when an error occurs. If you don't pass something, all errors are
-        silently swallowed. You probably don't want that, but `HIPInstanceLocator` tries to be flexible with respect to
-        how your tests run and what causes a crash. You'll probably want to make it an assertion failure.
+     - Parameter errorCallback: Block to be called when an error occurs. If you leave it alone, it will be an assertion
+        failure.
      */
-    public convenience init(assemblyBlock: HIPInstanceLocator -> Void, errorCallback: (ErrorType -> ())? = nil) {
+    public convenience init(assemblyBlock: HIPInstanceLocator -> Void, errorCallback: (ErrorType -> ()) = DEFAULT_ERROR_CALLBACK) {
         self.init(errorCallback: errorCallback)
         assemblyBlock(self)
     }
@@ -237,7 +239,7 @@ private extension HIPInstanceLocator {
                     throw LocatorError.NoDependencyRegisteredForType
             }
         } catch {
-            _errorCallback?(error)  // user may throw assertion error, do nothing, etc.
+            _errorCallback(error)  // user may throw assertion error, do nothing, etc.
             if error as? LocatorError != nil {
                 return nil
             } else {
@@ -251,7 +253,7 @@ private extension HIPInstanceLocator {
         defer { objc_sync_exit(_lock) }
 
         guard _registeredInstances[key] == nil else {
-            _errorCallback?(LocatorError.TriedToRegisterTooManyFactories)
+            _errorCallback(LocatorError.TriedToRegisterTooManyFactories)
             return false
         }
         _registeredInstances[key] = instance
@@ -263,7 +265,7 @@ private extension HIPInstanceLocator {
         defer { objc_sync_exit(_lock) }
 
         guard _registeredInjectors[key] == nil else {
-            _errorCallback?(LocatorError.TriedToRegisterTooManyInjectors)
+            _errorCallback(LocatorError.TriedToRegisterTooManyInjectors)
             return false
         }
         _registeredInjectors[key] = injector
