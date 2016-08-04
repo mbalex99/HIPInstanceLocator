@@ -127,7 +127,7 @@ private let DEFAULT_ERROR_CALLBACK = {
      
      Example
      */
-    public func getInstanceOf<T>(_:T.Type) -> T! { return (try? _getWithKey("\(T.self)"))! }
+    public func getInstanceOf<T>(_:T.Type) -> T! { return try! _getWithKey("\(T.self)") }
 
     /**
      Implicitly gets an instance of a previously registered type. If an instance was not already created, it will be 
@@ -191,7 +191,7 @@ public extension HIPInstanceLocator {
      Get an instance for a class without any fancy type inference.
     */
     @objc public func objc_getInstanceOfClass(aClass: AnyClass) -> AnyObject! {
-        return (try? _getWithKey("\(aClass)"))!
+        return try! _getWithKey("\(aClass)")
     }
 
     /**
