@@ -32,8 +32,10 @@ private class TestInjected {
 class TestInstanceLocator: XCTestCase {
     var instanceLocator: HIPInstanceLocator!
 
+    var lastError: ErrorType?
+
     override func setUp() {
-        instanceLocator = HIPInstanceLocator()
+        instanceLocator = HIPInstanceLocator(errorCallback: {[weak self] e in self?.lastError = e})
     }
 
     func testAlwaysReturnsTheSameRegisteredInstance() {
@@ -47,11 +49,19 @@ class TestInstanceLocator: XCTestCase {
 
     func testFailsToReturnIfNotRegistered() {
         XCTAssertNil(instanceLocator.getInstanceOf(TestClass.self))
+        switch lastError! {
+        case LocatorError.NoDependencyRegisteredForType: break
+        default: XCTFail("Error was not of expected type")
+        }
     }
 
     func testFailsToRegisterIfAlreadyRegistered() {
         instanceLocator.registerFactory(TestClass.self) { _ in return TestClass() }
         XCTAssertFalse(instanceLocator.registerFactory(TestClass.self) { _ in return TestClass(innerValue: "FAIL") })
+        switch lastError! {
+        case LocatorError.TriedToRegisterTooManyFactories: break
+        default: XCTFail("Error was not of expected type")
+        }
 
         let instance = instanceLocator.getInstanceOf(TestClass.self)
         XCTAssertEqual(instance.innerValue, "DEFAULT")
@@ -122,6 +132,10 @@ class TestInstanceLocator: XCTestCase {
         XCTAssertFalse(instanceLocator.injectInstancesOf(TestInjected.self) {
             $1.innerInstance = TestClass(innerValue: "FAIL")
         })
+        switch lastError! {
+        case LocatorError.TriedToRegisterTooManyInjectors: break
+        default: XCTFail("Error was not of expected type")
+        }
 
         let instance = instanceLocator.getInstanceOf(TestInjected.self)
         XCTAssertEqual(instance.innerInstance.innerValue, "DEFAULT")
@@ -147,6 +161,10 @@ class TestInstanceLocator: XCTestCase {
         let sharedClass = TestClass()
         instanceLocator.registerFactory(TestClass.self) { _ in return TestClass() }
         XCTAssertFalse(instanceLocator.register(TestClass.self, sharedInstance: sharedClass))
+        switch lastError! {
+        case LocatorError.TriedToRegisterTooManyFactories: break
+        default: XCTFail("Error was not of expected type")
+        }
         XCTAssert(sharedClass !== instanceLocator.getInstanceOf(TestClass.self))
     }
 

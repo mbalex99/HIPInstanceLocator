@@ -26,6 +26,16 @@ public enum LocatorError : ErrorType {
     /// framework.
     case StoredDependencyWasNotOfExpectedType
 
+    /// You tried to register more than one factory for the given type
+    case TriedToRegisterTooManyFactories
+
+    /// You tried to register more than one injector for the given type
+    case TriedToRegisterTooManyInjectors
+
+}
+
+private let DEFAULT_ERROR_CALLBACK = {
+    (e: ErrorType) in assertionFailure("\(e)")
 }
 
 /**
@@ -36,12 +46,29 @@ public enum LocatorError : ErrorType {
     private var _registeredInstances: [String: _Instance] = Dictionary()
     private var _registeredInjectors: [String: _Injector] = Dictionary()
     private let _lock = NSObject()
+    private let _errorCallback: (ErrorType -> ())
+
+    /**
+     Initializes a locator instance
+
+     - Parameter errorCallback: Block to be called when an error occurs. If you leave it alone, it will be an assertion
+                                failure.
+     */
+    public init(errorCallback: (ErrorType -> ()) = DEFAULT_ERROR_CALLBACK) {
+        _errorCallback = errorCallback
+        super.init()
+    }
 
     /**
      Initializes a locator instance; the assembly block is executed immediately after initialization.
+
+     - Parameter assemblyBlock: Assembly to be applied immediately
+
+     - Parameter errorCallback: Block to be called when an error occurs. If you leave it alone, it will be an assertion
+                                failure.
      */
-    public convenience init(assemblyBlock:HIPInstanceLocator -> Void) {
-        self.init()
+    public convenience init(assemblyBlock: HIPInstanceLocator -> Void, errorCallback: (ErrorType -> ()) = DEFAULT_ERROR_CALLBACK) {
+        self.init(errorCallback: errorCallback)
         assemblyBlock(self)
     }
 
@@ -84,10 +111,7 @@ public enum LocatorError : ErrorType {
      - Returns: `true` if the shared instance was successfully registered, otherwise `false`
      */
     public func register<T where T: AnyObject>(key:T.Type, sharedInstance: T) -> Bool {
-        guard let sharedObject = sharedInstance as? AnyObject else {
-            return false
-        }
-        let box = _Instance.SharedBox(value: sharedObject)
+        let box = _Instance.SharedBox(value: sharedInstance)
         return _setInstanceForKey("\(T.self)", instance: .Shared(box))
     }
 
@@ -103,7 +127,7 @@ public enum LocatorError : ErrorType {
      
      Example
      */
-    public func getInstanceOf<T>(_:T.Type) -> T! { return try? _getWithKey("\(T.self)") }
+    public func getInstanceOf<T>(_:T.Type) -> T! { return try! _getWithKey("\(T.self)") }
 
     /**
      Implicitly gets an instance of a previously registered type. If an instance was not already created, it will be 
@@ -125,7 +149,7 @@ public enum LocatorError : ErrorType {
      }
      ```
      */
-    public func implicitGet<T>() -> T! { return try? _getWithKey("\(T.self)") }
+    public func implicitGet<T>() -> T! { return getInstanceOf(T.self) }
 
     /**
      Registers an injector method for the specified type. The injector method is called once for each instance created
@@ -167,7 +191,7 @@ public extension HIPInstanceLocator {
      Get an instance for a class without any fancy type inference.
     */
     @objc public func objc_getInstanceOfClass(aClass: AnyClass) -> AnyObject! {
-        return try? _getWithKey("\(aClass)")
+        return try! _getWithKey("\(aClass)")
     }
 
     /**
@@ -191,30 +215,39 @@ private extension HIPInstanceLocator {
     }
     private typealias _Injector = (HIPInstanceLocator, Any) -> (Void)
 
-    func _getWithKey<T>(key: String) throws -> T! {
+    func _getWithKey<T>(key: String) throws -> T? {
         objc_sync_enter(_lock)
         defer { objc_sync_exit(_lock) }
 
-        switch _registeredInstances[key] {
-            case .Some(.Initialized(let instance)):
-                guard let definiteInstance = instance as? T else {
-                    throw LocatorError.StoredDependencyWasNotOfExpectedType
-                }
-                return definiteInstance
-            case .Some(.Uninitialized(let factory)):
-                guard let instance = factory(self) as? T else {
-                    throw LocatorError.FactoryDidNotReturnExpectedType
-                }
-                _registeredInstances[key] = .Initialized(instance)
-                _registeredInjectors[key]?(self, instance)
-                return instance
-            case .Some(.Shared(let box)):
-                guard let definiteInstance = box.value as? T else {
-                    throw LocatorError.SharedInstanceWasNotOfExpectedType
-                }
-                return definiteInstance
-            case .None:
-                throw LocatorError.NoDependencyRegisteredForType
+        do {
+            switch _registeredInstances[key] {
+                case .Some(.Initialized(let instance)):
+                    guard let definiteInstance = instance as? T else {
+                        throw LocatorError.StoredDependencyWasNotOfExpectedType
+                    }
+                    return definiteInstance
+                case .Some(.Uninitialized(let factory)):
+                    guard let instance = factory(self) as? T else {
+                        throw LocatorError.FactoryDidNotReturnExpectedType
+                    }
+                    _registeredInstances[key] = .Initialized(instance)
+                    _registeredInjectors[key]?(self, instance)
+                    return instance
+                case .Some(.Shared(let box)):
+                    guard let definiteInstance = box.value as? T else {
+                        throw LocatorError.SharedInstanceWasNotOfExpectedType
+                    }
+                    return definiteInstance
+                case .None:
+                    throw LocatorError.NoDependencyRegisteredForType
+            }
+        } catch {
+            _errorCallback(error)  // user may throw assertion error, do nothing, etc.
+            if error is LocatorError {
+                return nil
+            } else {
+                throw error
+            }
         }
     }
 
@@ -223,7 +256,7 @@ private extension HIPInstanceLocator {
         defer { objc_sync_exit(_lock) }
 
         guard _registeredInstances[key] == nil else {
-//            assertionFailure("Attempted to register a dependency when one already exists for type: \(key)")
+            _errorCallback(LocatorError.TriedToRegisterTooManyFactories)
             return false
         }
         _registeredInstances[key] = instance
@@ -235,7 +268,7 @@ private extension HIPInstanceLocator {
         defer { objc_sync_exit(_lock) }
 
         guard _registeredInjectors[key] == nil else {
-//            assertionFailure("Attempted to register an injector when one already exists for type: \(key)")
+            _errorCallback(LocatorError.TriedToRegisterTooManyInjectors)
             return false
         }
         _registeredInjectors[key] = injector

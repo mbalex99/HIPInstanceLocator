@@ -11,7 +11,7 @@ docs:
 		--github_url https://github.com/Hipmunk/HIPInstanceLocator \
 		--github-file-prefix https://github.com/Hipmunk/HIPInstanceLocator/tree/master \
 		--module HIPInstanceLocator \
-		--module-version 1.0 \
+		--module-version 1.0.1 \
 		--skip-undocumented \
 		--root-url https://hipmunk.github.com/HIPInstanceLocator
 		# --objc \
