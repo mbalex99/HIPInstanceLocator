@@ -50,8 +50,9 @@ private let DEFAULT_ERROR_CALLBACK = {
 
     /**
      Initializes a locator instance
+
      - Parameter errorCallback: Block to be called when an error occurs. If you leave it alone, it will be an assertion
-        failure.
+                                failure.
      */
     public init(errorCallback: (ErrorType -> ()) = DEFAULT_ERROR_CALLBACK) {
         _errorCallback = errorCallback
@@ -60,9 +61,11 @@ private let DEFAULT_ERROR_CALLBACK = {
 
     /**
      Initializes a locator instance; the assembly block is executed immediately after initialization.
+
      - Parameter assemblyBlock: Assembly to be applied immediately
+
      - Parameter errorCallback: Block to be called when an error occurs. If you leave it alone, it will be an assertion
-        failure.
+                                failure.
      */
     public convenience init(assemblyBlock: HIPInstanceLocator -> Void, errorCallback: (ErrorType -> ()) = DEFAULT_ERROR_CALLBACK) {
         self.init(errorCallback: errorCallback)
