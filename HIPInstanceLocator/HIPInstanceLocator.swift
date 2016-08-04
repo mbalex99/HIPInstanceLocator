@@ -243,7 +243,7 @@ private extension HIPInstanceLocator {
             }
         } catch {
             _errorCallback(error)  // user may throw assertion error, do nothing, etc.
-            if error as? LocatorError != nil {
+            if error is LocatorError {
                 return nil
             } else {
                 throw error
