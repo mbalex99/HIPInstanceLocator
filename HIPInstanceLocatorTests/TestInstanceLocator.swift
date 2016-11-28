@@ -32,7 +32,7 @@ private class TestInjected {
 class TestInstanceLocator: XCTestCase {
     var instanceLocator: HIPInstanceLocator!
 
-    var lastError: ErrorType?
+    var lastError: Error?
 
     override func setUp() {
         instanceLocator = HIPInstanceLocator(errorCallback: {[weak self] e in self?.lastError = e})
@@ -50,7 +50,7 @@ class TestInstanceLocator: XCTestCase {
     func testFailsToReturnIfNotRegistered() {
         XCTAssertNil(instanceLocator.getInstanceOf(TestClass.self))
         switch lastError! {
-        case LocatorError.NoDependencyRegisteredForType: break
+        case LocatorError.noDependencyRegisteredForType: break
         default: XCTFail("Error was not of expected type")
         }
     }
@@ -59,7 +59,7 @@ class TestInstanceLocator: XCTestCase {
         instanceLocator.registerFactory(TestClass.self) { _ in return TestClass() }
         XCTAssertFalse(instanceLocator.registerFactory(TestClass.self) { _ in return TestClass(innerValue: "FAIL") })
         switch lastError! {
-        case LocatorError.TriedToRegisterTooManyFactories: break
+        case LocatorError.triedToRegisterTooManyFactories: break
         default: XCTFail("Error was not of expected type")
         }
 
@@ -71,14 +71,14 @@ class TestInstanceLocator: XCTestCase {
         instanceLocator.registerFactory(TestClass.self) { _ in return TestClass() }
 
         var instances = [TestClass]()
-        let instancesQueue = dispatch_queue_create("com.hipmunk.testInstanceLocator.instancesQueue", DISPATCH_QUEUE_SERIAL)
-        let iterationQueue = dispatch_queue_create("com.hipmunk.testInstanceLocator.iterationQueue", DISPATCH_QUEUE_CONCURRENT)
+        let instancesQueue = DispatchQueue(label: "com.hipmunk.testInstanceLocator.instancesQueue", attributes: [])
+        let iterationQueue = DispatchQueue(label: "com.hipmunk.testInstanceLocator.iterationQueue", attributes: DispatchQueue.Attributes.concurrent)
 
-        let expectation = expectationWithDescription("finished iterations")
-        dispatch_apply(10, iterationQueue) {
+        let expectation = self.expectation(description: "finished iterations")
+        DispatchQueue.concurrentPerform(iterations: 10) {
             [weak self] index in
             guard let instance: TestClass = self?.instanceLocator.implicitGet() else { return }
-            dispatch_async(instancesQueue) {
+            instancesQueue.async {
                 instances.append(instance)
                 if index == 9 {
                     expectation.fulfill()
@@ -86,7 +86,7 @@ class TestInstanceLocator: XCTestCase {
             }
         }
 
-        waitForExpectationsWithTimeout(1.0, handler: nil)
+        waitForExpectations(timeout: 1.0, handler: nil)
         let areAllInstancesEqual = instances.reduce(true) { return $0 && $1 === instances[0] }
         XCTAssert(areAllInstancesEqual)
     }
@@ -133,7 +133,7 @@ class TestInstanceLocator: XCTestCase {
             $1.innerInstance = TestClass(innerValue: "FAIL")
         })
         switch lastError! {
-        case LocatorError.TriedToRegisterTooManyInjectors: break
+        case LocatorError.triedToRegisterTooManyInjectors: break
         default: XCTFail("Error was not of expected type")
         }
 
@@ -162,7 +162,7 @@ class TestInstanceLocator: XCTestCase {
         instanceLocator.registerFactory(TestClass.self) { _ in return TestClass() }
         XCTAssertFalse(instanceLocator.register(TestClass.self, sharedInstance: sharedClass))
         switch lastError! {
-        case LocatorError.TriedToRegisterTooManyFactories: break
+        case LocatorError.triedToRegisterTooManyFactories: break
         default: XCTFail("Error was not of expected type")
         }
         XCTAssert(sharedClass !== instanceLocator.getInstanceOf(TestClass.self))

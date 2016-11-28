@@ -34,13 +34,13 @@ import Foundation
  ```
  */
 public struct HIPInstanceLocatorAssembly {
-    private let _assemblyBlock: HIPInstanceLocator -> Void
+    fileprivate let _assemblyBlock: (HIPInstanceLocator) -> Void
 
     /** 
      Creates a new instance locator assembly with the given assembly block. The block is executed whenever this
      assembly is applied to an instance locator.
      */
-    public init(assemblyBlock: HIPInstanceLocator -> Void) {
+    public init(assemblyBlock: @escaping (HIPInstanceLocator) -> Void) {
         _assemblyBlock = assemblyBlock
     }
 }
@@ -51,7 +51,7 @@ public extension HIPInstanceLocator {
      is registered or injected more than once, then this will throw a debug assert in the same way that would happen if
      those dependencies were registered or injected outside of an assembly.
      */
-    public func assemble(assemblies: HIPInstanceLocatorAssembly...) {
+    public func assemble(_ assemblies: HIPInstanceLocatorAssembly...) {
         assemblies.forEach { $0._assemblyBlock(self) }
     }
 }

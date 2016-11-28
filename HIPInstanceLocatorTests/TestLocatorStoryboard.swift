@@ -14,7 +14,7 @@ private class TestLocatorStoryboardDependency {
 }
 
 class TestLocatorStoryboardViewController: UIViewController {
-    private var innerInstance: TestLocatorStoryboardDependency!
+    fileprivate var innerInstance: TestLocatorStoryboardDependency!
 }
 
 /**
@@ -23,17 +23,17 @@ class TestLocatorStoryboardViewController: UIViewController {
  */
 class TestLocatorStoryboard: XCTestCase {
     func testLocatorStoryboard() {
-        let locator = HIPInstanceLocator()
+        let locator = HIPInstanceLocator
         locator.registerFactory(TestLocatorStoryboardDependency.self) { _ in return TestLocatorStoryboardDependency() }
         locator.injectInstancesOf(TestLocatorStoryboardViewController.self) {
             $1.innerInstance = $0.implicitGet()
         }
 
-        let bundle = NSBundle(forClass: TestLocatorStoryboard.self)
+        let bundle = Bundle(for: TestLocatorStoryboard.self)
         let storyboard = HIPLocatorStoryboard(name: "TestLocatorStoryboard", bundle: bundle, locator: locator)
 
         let viewController =
-            storyboard.instantiateViewControllerWithIdentifier("TestLocatorStoryboardViewController")
+            storyboard.instantiateViewController(withIdentifier: "TestLocatorStoryboardViewController")
                 as? TestLocatorStoryboardViewController
 
         XCTAssertNotNil(viewController)

@@ -11,42 +11,42 @@ import Foundation
 /**
  Exceptions that may be thrown by `HIPInstanceLocator`.
  */
-public enum LocatorError : ErrorType {
+public enum LocatorError : Error {
     /// No shared instance or factory was registered for this type. You probably just forgot.
-    case NoDependencyRegisteredForType
+    case noDependencyRegisteredForType
 
     /// The factory passed to `HIPInstanceLocator.registerFactory(_:factory)` did not have the expected type.
-    case FactoryDidNotReturnExpectedType
+    case factoryDidNotReturnExpectedType
 
     /// A dependency stored using `HIPInstanceLocator.register(_:sharedInstance)` did not have the expected type.
-    case SharedInstanceWasNotOfExpectedType
+    case sharedInstanceWasNotOfExpectedType
 
     /// The stored return value of the factory passed to `HIPInstanceLocator.registerFactory(_:factory)`
     /// for the given type did not have the expected type. If you see this, there is probably a bug in the
     /// framework.
-    case StoredDependencyWasNotOfExpectedType
+    case storedDependencyWasNotOfExpectedType
 
     /// You tried to register more than one factory for the given type
-    case TriedToRegisterTooManyFactories
+    case triedToRegisterTooManyFactories
 
     /// You tried to register more than one injector for the given type
-    case TriedToRegisterTooManyInjectors
+    case triedToRegisterTooManyInjectors
 
 }
 
 private let DEFAULT_ERROR_CALLBACK = {
-    (e: ErrorType) in assertionFailure("\(e)")
+    (e: Error) in assertionFailure("\(e)")
 }
 
 /**
  An implementation of the service locator pattern. Provides a place to register and get shared instances of classes for
  a specific context. Instances are registered using factory blocks, which are lazily instantiated on demand.
  */
-@objc public class HIPInstanceLocator: NSObject {
-    private var _registeredInstances: [String: _Instance] = Dictionary()
-    private var _registeredInjectors: [String: _Injector] = Dictionary()
-    private let _lock = NSObject()
-    private let _errorCallback: (ErrorType -> ())
+@objc open class HIPInstanceLocator: NSObject {
+    fileprivate var _registeredInstances: [String: _Instance] = Dictionary()
+    fileprivate var _registeredInjectors: [String: _Injector] = Dictionary()
+    fileprivate let _lock = NSObject()
+    fileprivate let _errorCallback: ((Error) -> ())
 
     /**
      Initializes a locator instance
@@ -54,7 +54,7 @@ private let DEFAULT_ERROR_CALLBACK = {
      - Parameter errorCallback: Block to be called when an error occurs. If you leave it alone, it will be an assertion
                                 failure.
      */
-    public init(errorCallback: (ErrorType -> ()) = DEFAULT_ERROR_CALLBACK) {
+    public init(errorCallback: @escaping ((Error) -> ()) = DEFAULT_ERROR_CALLBACK) {
         _errorCallback = errorCallback
         super.init()
     }
@@ -67,7 +67,7 @@ private let DEFAULT_ERROR_CALLBACK = {
      - Parameter errorCallback: Block to be called when an error occurs. If you leave it alone, it will be an assertion
                                 failure.
      */
-    public convenience init(assemblyBlock: HIPInstanceLocator -> Void, errorCallback: (ErrorType -> ()) = DEFAULT_ERROR_CALLBACK) {
+    public convenience init(assemblyBlock: (HIPInstanceLocator) -> Void, errorCallback: @escaping ((Error) -> ()) = DEFAULT_ERROR_CALLBACK) {
         self.init(errorCallback: errorCallback)
         assemblyBlock(self)
     }
@@ -89,8 +89,8 @@ private let DEFAULT_ERROR_CALLBACK = {
      - Returns: `true` if the factory method was successfully registered, otherwise `false`
 
      */
-    public func registerFactory<T>(key:T.Type, factory:HIPInstanceLocator -> T) -> Bool {
-        return _setInstanceForKey("\(T.self)", instance: .Uninitialized(factory))
+    open func registerFactory<T>(_ key:T.Type, factory:@escaping (HIPInstanceLocator) -> T) -> Bool {
+        return _setInstanceForKey("\(T.self)", instance: .uninitialized(factory))
     }
 
     /**
@@ -110,9 +110,9 @@ private let DEFAULT_ERROR_CALLBACK = {
 
      - Returns: `true` if the shared instance was successfully registered, otherwise `false`
      */
-    public func register<T where T: AnyObject>(key:T.Type, sharedInstance: T) -> Bool {
+    open func register<T>(_ key:T.Type, sharedInstance: T) -> Bool where T: AnyObject {
         let box = _Instance.SharedBox(value: sharedInstance)
-        return _setInstanceForKey("\(T.self)", instance: .Shared(box))
+        return _setInstanceForKey("\(T.self)", instance: .shared(box))
     }
 
     /**
@@ -127,7 +127,7 @@ private let DEFAULT_ERROR_CALLBACK = {
      
      Example
      */
-    public func getInstanceOf<T>(_:T.Type) -> T! { return try! _getWithKey("\(T.self)") }
+    open func getInstanceOf<T>(_:T.Type) -> T! { return try! _getWithKey("\(T.self)") }
 
     /**
      Implicitly gets an instance of a previously registered type. If an instance was not already created, it will be 
@@ -149,7 +149,7 @@ private let DEFAULT_ERROR_CALLBACK = {
      }
      ```
      */
-    public func implicitGet<T>() -> T! { return getInstanceOf(T.self) }
+    open func implicitGet<T>() -> T! { return getInstanceOf(T.self) }
 
     /**
      Registers an injector method for the specified type. The injector method is called once for each instance created
@@ -166,7 +166,7 @@ private let DEFAULT_ERROR_CALLBACK = {
 
      - Returns: `true` if the instance was injected, otherwise `false`
      */
-    public func injectInstancesOf<T>(key: T.Type, injector:((HIPInstanceLocator, T) -> Void)) -> Bool {
+    open func injectInstancesOf<T>(_ key: T.Type, injector:@escaping ((HIPInstanceLocator, T) -> Void)) -> Bool {
         return _setInjectorForKey("\(T.self)") {
             /// Wrapping the injector function in this way seems to be necessary for downcasting to _Injector for
             /// storage in the injector dictionary in a way that the compiler is okay with.
@@ -179,7 +179,7 @@ private let DEFAULT_ERROR_CALLBACK = {
     /**
      Injects `instance` using the block specified for `T` in `HIPInstanceLocator.injectInstancesOf(_:injector:)`
      */
-    public func applyInjector<T>(instance: T) -> Bool {
+    open func applyInjector<T>(_ instance: T) -> Bool {
         return _applyInjector("\(T.self)", instance: instance)
     }
 }
@@ -190,14 +190,14 @@ public extension HIPInstanceLocator {
     /**
      Get an instance for a class without any fancy type inference.
     */
-    @objc public func objc_getInstanceOfClass(aClass: AnyClass) -> AnyObject! {
+    @objc public func objc_getInstanceOfClass(_ aClass: AnyClass) -> AnyObject! {
         return try! _getWithKey("\(aClass)")
     }
 
     /**
      Applies previously registered injector to an instance without any type inference.
      */
-    @objc public func objc_applyInjector(aClass: AnyClass, toInstance instance: AnyObject) -> Bool {
+    @objc public func objc_applyInjector(_ aClass: AnyClass, toInstance instance: AnyObject) -> Bool {
         return _applyInjector("\(aClass)", instance: instance)
     }
 }
@@ -205,41 +205,41 @@ public extension HIPInstanceLocator {
 /// MARK: - Internals
 
 private extension HIPInstanceLocator {
-    private enum _Instance {
-        private struct SharedBox {
+    enum _Instance {
+        fileprivate struct SharedBox {
             weak var value: AnyObject?
         }
-        case Uninitialized(HIPInstanceLocator -> Any)
-        case Initialized(Any)
-        case Shared(SharedBox)
+        case uninitialized((HIPInstanceLocator) -> Any)
+        case initialized(Any)
+        case shared(SharedBox)
     }
-    private typealias _Injector = (HIPInstanceLocator, Any) -> (Void)
+    typealias _Injector = (HIPInstanceLocator, Any) -> (Void)
 
-    func _getWithKey<T>(key: String) throws -> T? {
+    func _getWithKey<T>(_ key: String) throws -> T? {
         objc_sync_enter(_lock)
         defer { objc_sync_exit(_lock) }
 
         do {
             switch _registeredInstances[key] {
-                case .Some(.Initialized(let instance)):
+                case .some(.initialized(let instance)):
                     guard let definiteInstance = instance as? T else {
-                        throw LocatorError.StoredDependencyWasNotOfExpectedType
+                        throw LocatorError.storedDependencyWasNotOfExpectedType
                     }
                     return definiteInstance
-                case .Some(.Uninitialized(let factory)):
+                case .some(.uninitialized(let factory)):
                     guard let instance = factory(self) as? T else {
-                        throw LocatorError.FactoryDidNotReturnExpectedType
+                        throw LocatorError.factoryDidNotReturnExpectedType
                     }
-                    _registeredInstances[key] = .Initialized(instance)
+                    _registeredInstances[key] = .initialized(instance)
                     _registeredInjectors[key]?(self, instance)
                     return instance
-                case .Some(.Shared(let box)):
+                case .some(.shared(let box)):
                     guard let definiteInstance = box.value as? T else {
-                        throw LocatorError.SharedInstanceWasNotOfExpectedType
+                        throw LocatorError.sharedInstanceWasNotOfExpectedType
                     }
                     return definiteInstance
-                case .None:
-                    throw LocatorError.NoDependencyRegisteredForType
+                case .none:
+                    throw LocatorError.noDependencyRegisteredForType
             }
         } catch {
             _errorCallback(error)  // user may throw assertion error, do nothing, etc.
@@ -251,31 +251,31 @@ private extension HIPInstanceLocator {
         }
     }
 
-    func _setInstanceForKey(key: String, instance: _Instance) -> Bool {
+    func _setInstanceForKey(_ key: String, instance: _Instance) -> Bool {
         objc_sync_enter(_lock)
         defer { objc_sync_exit(_lock) }
 
         guard _registeredInstances[key] == nil else {
-            _errorCallback(LocatorError.TriedToRegisterTooManyFactories)
+            _errorCallback(LocatorError.triedToRegisterTooManyFactories)
             return false
         }
         _registeredInstances[key] = instance
         return true
     }
 
-    func _setInjectorForKey(key: String, injector: _Injector) -> Bool {
+    func _setInjectorForKey(_ key: String, injector: @escaping _Injector) -> Bool {
         objc_sync_enter(_lock)
         defer { objc_sync_exit(_lock) }
 
         guard _registeredInjectors[key] == nil else {
-            _errorCallback(LocatorError.TriedToRegisterTooManyInjectors)
+            _errorCallback(LocatorError.triedToRegisterTooManyInjectors)
             return false
         }
         _registeredInjectors[key] = injector
         return true
     }
 
-    func _applyInjector<T>(key: String, instance: T) -> Bool {
+    func _applyInjector<T>(_ key: String, instance: T) -> Bool {
         objc_sync_enter(_lock)
         defer { objc_sync_exit(_lock) }
 
